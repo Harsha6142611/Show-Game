@@ -1,11 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Box } from '@chakra-ui/react';
+import { Box,Button } from '@chakra-ui/react';
 
 const VideoChat = ({ socket, roomId, username }) => {
   const [stream, setStream] = useState(null);
   const [remoteStreams, setRemoteStreams] = useState({});
   const peerConnections = useRef({});
   const userVideo = useRef();
+  const jitsiContainerRef = useRef(null);
 
   useEffect(() => {
     // Get local video and audio stream
@@ -146,6 +147,28 @@ const VideoChat = ({ socket, roomId, username }) => {
     return peer;
   };
 
+  const startJitsi = () => {
+    const domain = 'meet.jit.si';
+    const options = {
+      roomName: roomId,
+      parentNode: jitsiContainerRef.current,
+      userInfo: {
+        displayName: username,
+      },
+    };
+
+    const api = new window.JitsiMeetExternalAPI(domain, options);
+    api.addEventListener('videoConferenceJoined', () => {
+      console.log(`${username} has joined the Jitsi meeting in room ${roomId}`);
+    });
+
+    api.addEventListener('readyToClose', () => {
+      console.log('Jitsi meeting ended.');
+    });
+  };
+
+
+
   // Bind remote streams to video elements when they are updated
   useEffect(() => {
     Object.keys(remoteStreams).forEach(peerId => {
@@ -186,7 +209,7 @@ const VideoChat = ({ socket, roomId, username }) => {
     p="10px"
   >
     {/* Local user video */}
-    <video
+    {/* <video
       ref={userVideo}
       autoPlay
       playsInline
@@ -195,11 +218,11 @@ const VideoChat = ({ socket, roomId, username }) => {
         ...getVideoStyle(),
         borderRadius: '10px',
         marginBottom: '10px'
-      }}
-    />
+      }} */}
+    {/* /> */}
 
     {/* Remote video streams */}
-    {Object.keys(remoteStreams).map((peerId) => (
+    {/* {Object.keys(remoteStreams).map((peerId) => (
       <video
         key={peerId}
         id={`remoteVideo-${peerId}`}
@@ -211,7 +234,16 @@ const VideoChat = ({ socket, roomId, username }) => {
           marginBottom: '10px'
         }}
       />
-    ))}
+    ))} */}
+
+
+      {/* Jitsi Meet Integration */}
+      <div ref={jitsiContainerRef} style={{ width: '100%', height: '100%' }}></div>
+
+      {/* Button to Start Jitsi */}
+      <Button onClick={startJitsi} mt="20px">
+        Start Jitsi Meeting
+      </Button>
   </Box>
   );
 };
