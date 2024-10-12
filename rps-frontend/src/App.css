@@ -1,0 +1,24 @@
+.card {
+  background: white;
+  border-radius: 10px;
+  width: 120px; /* Set a fixed width */
+  height: 180px; /* Set a fixed height */
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+  display: flex; /* Flexbox for centering content */
+  align-items: center; /* Center content vertically */
+  justify-content: center; /* Center content horizontally */
+}
+
+.card:hover {
+  transform: translateY(-5px) rotateY(10deg);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.selected-card {
+  background: lightblue; /* Change the background color for the selected card */
+  border: 2px solid blue; /* Optional: Add a border to make it stand out */
+}

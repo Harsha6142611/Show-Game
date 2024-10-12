@@ -1,0 +1,46 @@
+/* Chat.css */
+
+/* General styling for the chat container */
+.chat-container {
+    position: relative;
+    width: 300px; /* Set the width of the chat container */
+    height: 400px; /* Set the height of the chat container */
+    border-radius: 8px; /* Rounded corners */
+    background-color: rgba(255, 255, 255, 0.8); /* Slightly transparent white */
+    border: 1px solid gray; /* Border color */
+}
+
+/* Styling for the message box */
+.messages {
+    overflow-y: auto; /* Enable vertical scrolling */
+    height: calc(100% - 50px); /* Leave space for input */
+    padding: 10px; /* Padding inside the message box */
+    display: flex;
+    flex-direction: column; /* Align items vertically */
+    background-color: rgba(255, 255, 255, 0.6); /* Background color */
+    border-radius: 8px; /* Rounded corners */
+}
+
+/* Styling for each message */
+.message {
+    margin-bottom: 5px; /* Space between messages */
+    color: black; /* Message text color */
+    text-align: left; /* Left align the text */
+    align-self: flex-start; /* Align each message to the start of the flex container */
+}
+
+/* Input field styles */
+.input-container {
+    display: flex; /* Align input and button horizontally */
+    margin-top: 10px; /* Space above the input */
+}
+
+.input {
+    flex: 1; /* Input takes available width */
+    margin-right: 5px; /* Space between input and button */
+}
+
+/* Button styling */
+.button {
+    margin-top: 0; /* Reset margin for button */
+}
