@@ -25,6 +25,7 @@ import {
 import './App.css'; // Import the CSS file for styling
 import PlayerCircle from './PlayerCircle';
 import Chat from './Chat';
+import VideoChat from './VideoChat';
 const socket = io('https://show-game.onrender.com');
 
 const App = () => {
@@ -346,8 +347,12 @@ const App = () => {
       <>
       <Box mb={4}>
   <Text fontSize="lg" fontWeight="bold">Room ID: {roomId}</Text>
-  <Flex justifyContent="center" alignItems="center" position="relative">
+  <Flex justifyContent="center" alignItems="center" position="relative" gap="20px" >
 
+    <Box position={"absolute"} left={-370}>
+      <VideoChat socket={socket} roomId={roomId} username={username} />
+    </Box>
+    
     <Box flex="0 1 auto">
       <PlayerCircle players={players} currentTurnPlayer={turnPlayer} />
     </Box>

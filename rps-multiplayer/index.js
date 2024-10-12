@@ -120,6 +120,39 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('webrtc-answer', (roomId, answer) => {
+    const room = rooms[roomId];
+    if (room) {
+      socket.broadcast.to(roomId).emit('webrtc-answer', answer); // Send answer to other users in room
+    }
+  });
+
+  socket.on('webrtc-ice-candidate', (roomId, candidate) => {
+    const room = rooms[roomId];
+    if (room) {
+      socket.broadcast.to(roomId).emit('webrtc-ice-candidate', candidate); // Send ICE candidate to other users
+    }
+  });
+
+  // Handle sending WebRTC offer/answer signals
+socket.on('sendSignal', ({ roomId, signalData, from }) => {
+  const room = rooms[roomId];
+  if (!room) return;
+
+  // Send the signal to all other users in the room except the one who sent it
+  socket.broadcast.to(roomId).emit('receiveSignal', { signalData, from });
+});
+
+// Handle sending ICE candidates
+socket.on('sendIceCandidate', ({ roomId, candidate, from }) => {
+  const room = rooms[roomId];
+  if (!room) return;
+
+  // Broadcast ICE candidate to other peers in the room
+  socket.broadcast.to(roomId).emit('receiveIceCandidate', { candidate, from });
+});
+
+
   socket.on('submit-cards', (roomId, customCardNames, callback) => {
     console.log("Room Id: " + roomId);
     const room = rooms[roomId];
