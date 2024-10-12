@@ -23,9 +23,9 @@ import {
   Flex
 } from '@chakra-ui/react';
 import './App.css'; // Import the CSS file for styling
-import PlayerCircle from './playercircle';
+import PlayerCircle from './PlayerCircle';
 import Chat from './Chat';
-const socket = io('http://localhost:3001');
+const socket = io('https://show-game.onrender.com');
 
 const App = () => {
   const [username, setUsername] = useState('');

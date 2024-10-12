@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/socket.io': {
-        target: 'http://localhost:3001',
+        target: 'https://show-game.onrender.com',
         ws: true,
       },
     },
