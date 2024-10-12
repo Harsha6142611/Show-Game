@@ -89,6 +89,7 @@ io.on('connection', (socket) => {
         io.in(roomId).emit('room-full');
         console.log(`Room ${roomId} is now full.`);
       }
+      socket.broadcast.to(roomId).emit('userJoined', { id: socket.id, username });
     } else {
       callback({
         success: false,
@@ -135,22 +136,24 @@ io.on('connection', (socket) => {
   });
 
   // Handle sending WebRTC offer/answer signals
-socket.on('sendSignal', ({ roomId, signalData, from }) => {
-  const room = rooms[roomId];
-  if (!room) return;
+  socket.on('sendSignal', ({ roomId, signalData, to }) => {
+    console.log("Sending signal: " + signalData + " to room: " + roomId);
+    const room = rooms[roomId];
+    if (!room) return;
 
-  // Send the signal to all other users in the room except the one who sent it
-  socket.broadcast.to(roomId).emit('receiveSignal', { signalData, from });
-});
+    // Send the signal to the specific peer (user)
+    io.to(to).emit('receiveSignal', { signalData, from: socket.id });
+  });
 
-// Handle sending ICE candidates
-socket.on('sendIceCandidate', ({ roomId, candidate, from }) => {
-  const room = rooms[roomId];
-  if (!room) return;
+  // Handle sending ICE candidates
+  socket.on('sendIceCandidate', ({ roomId, candidate, to }) => {
+    console.log("Sending ICE candidate: " + candidate + " to room: " + roomId);
+    const room = rooms[roomId];
+    if (!room) return;
 
-  // Broadcast ICE candidate to other peers in the room
-  socket.broadcast.to(roomId).emit('receiveIceCandidate', { candidate, from });
-});
+    // Send the ICE candidate to the specific peer (user)
+    io.to(to).emit('receiveIceCandidate', { candidate, from: socket.id });
+  });
 
 
   socket.on('submit-cards', (roomId, customCardNames, callback) => {

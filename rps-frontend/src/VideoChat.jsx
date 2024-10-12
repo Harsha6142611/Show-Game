@@ -1,135 +1,3 @@
-// import React, { useRef, useState, useEffect } from 'react';
-// import io from 'socket.io-client';
-
-// // const socket = io('http://localhost:3001'); // Change to your server's URL
-
-// const VideoChat = ({ socket,roomId, username }) => {
-//   const [stream, setStream] = useState(null);
-//   const [remoteStreams, setRemoteStreams] = useState({});
-//   const peerConnections = useRef({});
-//   const userVideo = useRef();
-
-//   useEffect(() => {
-//     // Get local video and audio stream
-//     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-//       .then((stream) => {
-//         setStream(stream);
-//         if (userVideo.current) {
-//           userVideo.current.srcObject = stream;
-//         }
-
-//         // socket.emit('joinRoom', { roomId, username });
-
-//         // Handle new users joining the room
-//         socket.on('userJoined', ({ id, username }) => {
-//           const peer = createPeerConnection(id);
-//           peer.createOffer()
-//             .then(offer => peer.setLocalDescription(offer))
-//             .then(() => {
-//               socket.emit('sendSignal', { roomId, signalData: peer.localDescription, to: id });
-//             });
-//         });
-
-//         // Handle signal reception
-//         socket.on('receiveSignal', ({ signalData, from }) => {
-//           handleReceiveSignal(signalData, from);
-//         });
-
-//         // Handle ICE candidate reception
-//         socket.on('receiveIceCandidate', ({ candidate, from }) => {
-//           handleNewIceCandidate(candidate, from);
-//         });
-
-//         // Handle user disconnection
-//         socket.on('userDisconnected', ({ id }) => {
-//           if (peerConnections.current[id]) {
-//             peerConnections.current[id].close();
-//             delete peerConnections.current[id];
-//             setRemoteStreams((prevStreams) => {
-//               const updatedStreams = { ...prevStreams };
-//               delete updatedStreams[id];
-//               return updatedStreams;
-//             });
-//           }
-//         });
-//       }).catch(error => console.error('Error accessing media devices.', error));
-
-//     return () => {
-//       socket.off('userJoined');
-//       socket.off('receiveSignal');
-//       socket.off('receiveIceCandidate');
-//       socket.off('userDisconnected');
-//     };
-//   }, [roomId, username]);
-
-//   const handleReceiveSignal = (signalData, from) => {
-//     const peer = createPeerConnection(from);
-
-//     peer.setRemoteDescription(new RTCSessionDescription(signalData))
-//       .then(() => {
-//         if (signalData.type === 'offer') {
-//           return peer.createAnswer();
-//         }
-//       })
-//       .then(answer => {
-//         if (answer) {
-//           peer.setLocalDescription(answer);
-//           socket.emit('sendSignal', { roomId, signalData: answer, to: from });
-//         }
-//       });
-//   };
-
-//   const handleNewIceCandidate = (candidate, from) => {
-//     const peer = peerConnections.current[from];
-//     if (peer) {
-//       peer.addIceCandidate(new RTCIceCandidate(candidate))
-//         .catch(e => console.error('Error adding ICE candidate: ', e));
-//     }
-//   };
-
-//   const createPeerConnection = (peerId) => {
-//     const peer = new RTCPeerConnection({
-//       iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
-//     });
-
-//     peerConnections.current[peerId] = peer;
-
-//     peer.onicecandidate = (event) => {
-//       if (event.candidate) {
-//         socket.emit('sendIceCandidate', { roomId, candidate: event.candidate, to: peerId });
-//       }
-//     };
-
-//     peer.ontrack = (event) => {
-//       setRemoteStreams((prevStreams) => ({
-//         ...prevStreams,
-//         [peerId]: event.streams[0],
-//       }));
-//     };
-
-//     stream.getTracks().forEach(track => peer.addTrack(track, stream));
-
-//     return peer;
-//   };
-
-//   return (
-//     <div>
-//       <h2>Video Chat</h2>
-//       <div>
-//         <video ref={userVideo} autoPlay playsInline muted style={{ width: '300px' }} />
-//         {Object.keys(remoteStreams).map((peerId) => (
-//           <video key={peerId} srcObject={remoteStreams[peerId]} autoPlay playsInline style={{ width: '300px' }} />
-//         ))}
-//       </div>
-//       <button onClick={() => callUser()}>Call</button>
-//     </div>
-//   );
-// };
-
-// export default VideoChat;
-
-
-
 import React, { useRef, useState, useEffect } from 'react';
 import { Box } from '@chakra-ui/react';
 
@@ -162,11 +30,13 @@ const VideoChat = ({ socket, roomId, username }) => {
 
         // Handle signal reception
         socket.on('receiveSignal', ({ signalData, from }) => {
+          console.log("Received signal from: " + from);
           handleReceiveSignal(signalData, from);
         });
 
         // Handle ICE candidate reception
         socket.on('receiveIceCandidate', ({ candidate, from }) => {
+          console.log("Received ICE candidate from: " + from);
           handleNewIceCandidate(candidate, from);
         });
 
