@@ -12,31 +12,29 @@ const VideoChat = ({ socket, roomId, username }) => {
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
       .then((localStream) => {
         setStream(localStream);
-        if (userVideo.current) {
-          userVideo.current.srcObject = localStream;
-        }
 
+        // Emit that the user has joined the room
         socket.emit('joinRoom', { roomId, username });
 
         // Handle new users joining the room
         socket.on('userJoined', ({ id }) => {
-          const peer = createPeerConnection(id);
-          peer.createOffer()
-            .then(offer => peer.setLocalDescription(offer))
-            .then(() => {
-              socket.emit('sendSignal', { roomId, signalData: peer.localDescription, to: id });
-            });
+          if (stream) {
+            const peer = createPeerConnection(id);
+            peer.createOffer()
+              .then(offer => peer.setLocalDescription(offer))
+              .then(() => {
+                socket.emit('sendSignal', { roomId, signalData: peer.localDescription, to: id });
+              });
+          }
         });
 
-        // Handle signal reception
+        // Handle receiving signal
         socket.on('receiveSignal', ({ signalData, from }) => {
-          console.log("Received signal from: " + from);
           handleReceiveSignal(signalData, from);
         });
 
         // Handle ICE candidate reception
         socket.on('receiveIceCandidate', ({ candidate, from }) => {
-          console.log("Received ICE candidate from: " + from);
           handleNewIceCandidate(candidate, from);
         });
 
@@ -52,7 +50,8 @@ const VideoChat = ({ socket, roomId, username }) => {
             });
           }
         });
-      }).catch(error => console.error('Error accessing media devices.', error));
+      })
+      .catch(error => console.error('Error accessing media devices.', error));
 
     return () => {
       socket.off('userJoined');
@@ -62,8 +61,19 @@ const VideoChat = ({ socket, roomId, username }) => {
     };
   }, [roomId, username, socket]);
 
+  // Bind local stream to video element only when stream is available
+  useEffect(() => {
+    if (userVideo.current && stream) {
+      userVideo.current.srcObject = stream;
+    }
+  }, [stream]);
+
   const handleReceiveSignal = (signalData, from) => {
-    const peer = createPeerConnection(from);
+    let peer = peerConnections.current[from];
+
+    if (!peer) {
+      peer = createPeerConnection(from);
+    }
 
     peer.setRemoteDescription(new RTCSessionDescription(signalData))
       .then(() => {
@@ -73,10 +83,12 @@ const VideoChat = ({ socket, roomId, username }) => {
       })
       .then(answer => {
         if (answer) {
-          peer.setLocalDescription(answer);
-          socket.emit('sendSignal', { roomId, signalData: answer, to: from });
+          return peer.setLocalDescription(answer).then(() => {
+            socket.emit('sendSignal', { roomId, signalData: answer, to: from });
+          });
         }
-      });
+      })
+      .catch((err) => console.error('Error handling signal: ', err));
   };
 
   const handleNewIceCandidate = (candidate, from) => {
@@ -107,23 +119,42 @@ const VideoChat = ({ socket, roomId, username }) => {
       }));
     };
 
-    stream.getTracks().forEach(track => peer.addTrack(track, stream));
+    if (stream) {
+      stream.getTracks().forEach(track => peer.addTrack(track, stream));
+    }
 
     return peer;
   };
 
+  // Bind remote streams to video elements when they are updated
+  useEffect(() => {
+    Object.keys(remoteStreams).forEach(peerId => {
+      const videoElement = document.getElementById(`remoteVideo-${peerId}`);
+      if (videoElement && videoElement.srcObject !== remoteStreams[peerId]) {
+        videoElement.srcObject = remoteStreams[peerId];
+      }
+    });
+  }, [remoteStreams]);
+
   return (
     <div>
       <div style={{ display: 'flex', flexDirection: 'row', gap: '20px' }}>
-        
-        {/* Box with background behind user's own video */}
-        <Box position="relative" height="400px" width="300px" display="inline-block" p="10px" bg="gray.200" borderRadius="10px">
+        {/* User's own video */}
+        <Box
+          position="relative"
+          height="400px"
+          width="300px"
+          display="inline-block"
+          p="10px"
+          bg="gray.200"
+          borderRadius="10px"
+        >
           <video
             ref={userVideo}
             autoPlay
             playsInline
             muted
-            style={{ width: '100%', height: '50%', borderRadius: '20px', zIndex: 1 }} // Set width to 100%
+            style={{ width: '100%', height: '50%', borderRadius: '20px', zIndex: 1 }}
           />
         </Box>
 
@@ -138,14 +169,10 @@ const VideoChat = ({ socket, roomId, username }) => {
             borderRadius="10px"
           >
             <video
+              id={`remoteVideo-${peerId}`}
               autoPlay
               playsInline
-              style={{ width: '100%', borderRadius: '10px', zIndex: 1 }} // Set width to 100%
-              ref={(el) => {
-                if (el && remoteStreams[peerId]) {
-                  el.srcObject = remoteStreams[peerId];
-                }
-              }}
+              style={{ width: '100%', borderRadius: '10px', zIndex: 1 }}
             />
           </Box>
         ))}
