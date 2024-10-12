@@ -85,10 +85,13 @@ io.on('connection', (socket) => {
       socket.join(roomId);
       callback({ success: true, players: room.players });
       io.in(roomId).emit('update-players', room.players);
+      
       if (room.players.length === room.numPlayers) {
         io.in(roomId).emit('room-full');
         console.log(`Room ${roomId} is now full.`);
       }
+
+      console.log(`Player ${username} joined room ${roomId}`);
       socket.broadcast.to(roomId).emit('userJoined', { id: socket.id, username });
     } else {
       callback({
@@ -121,19 +124,7 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('webrtc-answer', (roomId, answer) => {
-    const room = rooms[roomId];
-    if (room) {
-      socket.broadcast.to(roomId).emit('webrtc-answer', answer); // Send answer to other users in room
-    }
-  });
-
-  socket.on('webrtc-ice-candidate', (roomId, candidate) => {
-    const room = rooms[roomId];
-    if (room) {
-      socket.broadcast.to(roomId).emit('webrtc-ice-candidate', candidate); // Send ICE candidate to other users
-    }
-  });
+  
 
   // Handle sending WebRTC offer/answer signals
   socket.on('sendSignal', ({ roomId, signalData, to }) => {

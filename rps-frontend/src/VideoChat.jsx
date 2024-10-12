@@ -18,14 +18,19 @@ const VideoChat = ({ socket, roomId, username }) => {
 
         // Handle new users joining the room
         socket.on('userJoined', ({ id }) => {
+          console.log(`User ${id} has joined the room.`);
+          const peer = createPeerConnection(id);
+          
+          // Add local stream tracks to this new peer connection
           if (stream) {
-            const peer = createPeerConnection(id);
-            peer.createOffer()
-              .then(offer => peer.setLocalDescription(offer))
-              .then(() => {
-                socket.emit('sendSignal', { roomId, signalData: peer.localDescription, to: id });
-              });
+            stream.getTracks().forEach(track => peer.addTrack(track, stream));
           }
+
+          peer.createOffer()
+            .then(offer => peer.setLocalDescription(offer))
+            .then(() => {
+              socket.emit('sendSignal', { roomId, signalData: peer.localDescription, to: id });
+            });
         });
 
         // Handle receiving signal
@@ -59,7 +64,7 @@ const VideoChat = ({ socket, roomId, username }) => {
       socket.off('receiveIceCandidate');
       socket.off('userDisconnected');
     };
-  }, [roomId, username, socket]);
+  }, [roomId, username, socket, stream]);
 
   // Bind local stream to video element only when stream is available
   useEffect(() => {
@@ -118,10 +123,6 @@ const VideoChat = ({ socket, roomId, username }) => {
         [peerId]: event.streams[0],
       }));
     };
-
-    if (stream) {
-      stream.getTracks().forEach(track => peer.addTrack(track, stream));
-    }
 
     return peer;
   };
