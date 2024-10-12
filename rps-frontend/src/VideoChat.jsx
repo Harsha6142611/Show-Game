@@ -158,48 +158,54 @@ const VideoChat = ({ socket, roomId, username }) => {
   }, [remoteStreams]);
 
   return (
-    <div>
-      <div style={{ display: 'flex', flexDirection: 'row', gap: '20px' }}>
-        {/* User's own video */}
+    <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: `repeat(${Math.min(Object.keys(remoteStreams).length + 1, 4)}, 1fr)`,
+        gap: '10px',
+        width: '100%',
+        maxWidth: '1200px',
+      }}
+    >
+      {/* User's own video */}
+      <Box
+        position="relative"
+        display="inline-block"
+        p="10px"
+        bg="gray.200"
+        borderRadius="10px"
+      >
+        <video
+          ref={userVideo}
+          autoPlay
+          playsInline
+          muted
+          style={{ width: '100%', height: '100%', borderRadius: '10px' }}
+        />
+      </Box>
+
+      {/* Display remote video streams */}
+      {Object.keys(remoteStreams).map((peerId) => (
         <Box
+          key={peerId}
           position="relative"
-          height="400px"
-          width="300px"
           display="inline-block"
           p="10px"
           bg="gray.200"
           borderRadius="10px"
         >
           <video
-            ref={userVideo}
+            id={`remoteVideo-${peerId}`}
             autoPlay
             playsInline
-            muted
-            style={{ width: '100%', height: '50%', borderRadius: '20px', zIndex: 1 }}
+            style={{ width: '100%', height: '100%', borderRadius: '10px' }}
           />
         </Box>
-
-        {/* Display remote video streams */}
-        {Object.keys(remoteStreams).map((peerId) => (
-          <Box
-            key={peerId}
-            position="relative"
-            display="inline-block"
-            p="10px"
-            bg="gray.200"
-            borderRadius="10px"
-          >
-            <video
-              id={`remoteVideo-${peerId}`}
-              autoPlay
-              playsInline
-              style={{ width: '100%', borderRadius: '10px', zIndex: 1 }}
-            />
-          </Box>
-        ))}
-      </div>
+      ))}
     </div>
-  );
+  </div>
+      );
 };
 
 export default VideoChat;
