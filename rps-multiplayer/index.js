@@ -11,7 +11,7 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ['https://show-game-1.onrender.com/'], 
+    origin: ['http://localhost:5173','https://show-game-1.onrender.com/'], 
     methods: ['GET', 'POST'],
   },
 });
