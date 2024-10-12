@@ -93,6 +93,7 @@ io.on('connection', (socket) => {
 
       console.log(`Player ${username} joined room ${roomId}`);
       socket.broadcast.to(roomId).emit('userJoined', { id: socket.id, username });
+      
     } else {
       callback({
         success: false,
