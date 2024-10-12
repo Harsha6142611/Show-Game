@@ -157,56 +157,63 @@ const VideoChat = ({ socket, roomId, username }) => {
     });
   }, [remoteStreams]);
 
-  
-  return (
-    <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: `repeat(${Math.min(Object.keys(remoteStreams).length + 1, 4)}, 1fr)`,
-        gap: '10px',
-        width: '100%',
-        maxWidth: '1200px',
-      }}
-    >
-      {/* User's own video */}
-      <Box
-        position="relative"
-        display="inline-block"
-        p="10px"
-        bg="gray.200"
-        borderRadius="10px"
-      >
-        <video
-          ref={userVideo}
-          autoPlay
-          playsInline
-          muted
-          style={{ width: '100%', height: '100%', borderRadius: '10px' }}
-        />
-      </Box>
+  const totalVideos = 1 + Object.keys(remoteStreams).length;
 
-      {/* Display remote video streams */}
-      {Object.keys(remoteStreams).map((peerId) => (
-        <Box
-          key={peerId}
-          position="relative"
-          display="inline-block"
-          p="10px"
-          bg="gray.200"
-          borderRadius="10px"
-        >
-          <video
-            id={`remoteVideo-${peerId}`}
-            autoPlay
-            playsInline
-            style={{ width: '100%', height: '100%', borderRadius: '10px' }}
-          />
-        </Box>
-      ))}
-    </div>
-  </div>
-      );
+  const getVideoStyle = () => {
+    if (totalVideos === 2) {
+      return { width: '50%', height: '100%' };
+    } else if (totalVideos <= 4) {
+      return { width: '50%', height: '50%' };
+    } else if (totalVideos <= 6) {
+      return { width: '33%', height: '50%' };
+    } else if (totalVideos <= 8) {
+      return { width: '25%', height: '50%' };
+    }
+    return { width: '100%', height: '100%' }; // Default for 1 video
+  };
+
+  return (
+    <Box
+    position="relative"
+    height="400px"  // Fixed height
+    width="300px"   // Fixed width
+    display="flex"
+    flexWrap="wrap"
+    bg="gray.200"
+    borderRadius="10px"
+    justifyContent="center"
+    alignItems="center"
+    p="10px"
+  >
+    {/* Local user video */}
+    <video
+      ref={userVideo}
+      autoPlay
+      playsInline
+      muted
+      style={{
+        ...getVideoStyle(),
+        borderRadius: '10px',
+        marginBottom: '10px'
+      }}
+    />
+
+    {/* Remote video streams */}
+    {Object.keys(remoteStreams).map((peerId) => (
+      <video
+        key={peerId}
+        id={`remoteVideo-${peerId}`}
+        autoPlay
+        playsInline
+        style={{
+          ...getVideoStyle(),
+          borderRadius: '10px',
+          marginBottom: '10px'
+        }}
+      />
+    ))}
+  </Box>
+  );
 };
 
 export default VideoChat;
