@@ -8,8 +8,6 @@ import {
   VStack,
   HStack,
   Heading,
-  UnorderedList,
-  ListItem,
   Alert,
   AlertIcon,
   Center,
@@ -23,10 +21,15 @@ import {
   Flex
 } from '@chakra-ui/react';
 import './App.css'; // Import the CSS file for styling
-import PlayerCircle from './PlayerCircle';
-import Chat from './Chat';
-import VideoChat from './VideoChat';
+import PlayerCircle from './Components/PlayerCircle';
+import Chat from './Components/Chat';
+import VideoChat from './Components/VideoChat';
+import { motion } from 'framer-motion';
+const MotionButton = motion(Button);
+
 const socket = io('https://show-game.onrender.com');
+// const socket = io("http://localhost:3001");
+
 
 const App = () => {
   const [username, setUsername] = useState('');
@@ -49,6 +52,15 @@ const App = () => {
   const [rematchVotes, setRematchVotes] = useState(0);
   const [hasVoted, setHasVoted] = useState(false);
   const [currentPage, setCurrentPage] = useState("home");
+  
+  const neonColors = ['#00FFFF', '#FF00FF', '#00FF00', '#FFEA00', '#FF1493', '#1E90FF', '#FF4500'];
+  // Function to consistently map cards to the same color
+  const getNeonColor = (card) => {
+    // Create a hash based on the card name to consistently assign the same color
+    const hash = Array.from(card).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return neonColors[hash % neonColors.length];
+  };
+  
   useEffect(() => {
     socket.on('update-players', (updatedPlayers) => {
       setPlayers(updatedPlayers);
@@ -283,15 +295,18 @@ const App = () => {
   };
   
   return (
-     <Center
-    h="100vh" // Full viewport height
-    w="100vw" // Full viewport width (optional)
-    flexDirection="column"
-    textAlign="center"
-    justifyContent="center"  // Center vertically
-    alignItems="center"       // Center horizontally
-  >
-    <Heading mb={4}>Multiplayer Card Game</Heading>
+     <Center     
+     as={motion.div}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1 }}
+      h="100vh"
+      w="100vw"
+      flexDirection="column"
+      textAlign="center"
+      justifyContent="center"
+      alignItems="center">
+    <Heading  mb={4} textShadow="0 0 20px #FF00FF, 0 0 15px #00FFFF" >Multiplayer Card Game</Heading>
     {!isRoomCreated && currentPage==="home"? (
       <VStack spacing={4} align="center">
         <Input
@@ -299,7 +314,18 @@ const App = () => {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           width="300px" // Optional: Set a specific width for better alignment
-        />
+          border="2px solid #00FFFF"
+            _hover={{ boxShadow: '0 0 30px #FF00FF' }}
+            _focus={{
+              boxShadow: '0 0 40px #FF00FF, 0 0 50px #00FFFF',
+              borderColor: '#FF00FF',
+            }}
+            transition="all 0.4s ease"
+            bg="blackAlpha.800"
+            color="white"
+            textShadow="0 0 5px #00FFFF"
+
+        /> <br />
         <Heading size="md">Create Room</Heading>
         <Input
           type="number"
@@ -312,10 +338,27 @@ const App = () => {
             max={8}
           width="300px" // Optional
         />
-        <Button colorScheme="teal" onClick={createRoom}>
+        {/* <Button colorScheme="teal" onClick={createRoom}>
           Create Room
-        </Button>
+        </Button> */}
 
+        <MotionButton
+            colorScheme="teal"
+            size="lg"
+            bg="blackAlpha.800"
+            _hover={{
+              boxShadow: '0 0 30px #FF00FF, 0 0 40px #00FFFF',
+              transform: 'scale(1.1)',
+            }}
+            boxShadow="0 0 20px #00FFFF, 0 0 30px #FF00FF"
+            transition="all 0.4s"
+            whileTap={{ scale: 0.9 }}
+            onClick={createRoom}
+          >
+            Create Room
+          </MotionButton>
+  
+          <br />
         <Heading size="md">Join Room</Heading>
         <Input
           placeholder="Enter room ID"
@@ -323,13 +366,28 @@ const App = () => {
           onChange={(e) => setRoomIdInput(e.target.value)}
           width="300px" // Optional
         />
-        <Button colorScheme="blue" onClick={joinRoom}>
+        {/* <Button colorScheme="blue" onClick={joinRoom}>
           Join Room
-        </Button>
+        </Button> */}
+        <MotionButton
+            colorScheme="teal"
+            size="lg"
+            bg="blackAlpha.800"
+            _hover={{
+              boxShadow: '0 0 30px #FF00FF, 0 0 40px #00FFFF',
+              transform: 'scale(1.1)',
+            }}
+            boxShadow="0 0 20px #00FFFF, 0 0 30px #FF00FF"
+            transition="all 0.4s"
+            whileTap={{ scale: 0.9 }}
+            onClick={joinRoom}
+          >
+            Join Room
+          </MotionButton>
       </VStack>
     ) : !customCardsSubmitted && isRoomCreator? (
       <VStack spacing={4} align="center">
-        <Heading size="md">Enter Custom Card Names</Heading>
+        <Heading size="md" color="white">Enter Custom Card Names</Heading>
         {cardNames.map((cardName, index) => (
           <Input
             key={index}
@@ -337,16 +395,39 @@ const App = () => {
             value={cardName}
             onChange={(e) => handleCardNameChange(index, e.target.value)}
             width="300px"
+              border="2px solid #00FFFF"
+              _hover={{ boxShadow: '0 0 30px #FF00FF' }}
+              transition="all 0.4s"
+              bg="blackAlpha.800"
+              color="white"
+              textShadow="0 0 5px #00FFFF"
           />
         ))}
-        <Button colorScheme="green" onClick={submitCustomCardNames}>
+        {/* <Button colorScheme="green" onClick={submitCustomCardNames}>
           Submit Card Names
-        </Button>
+        </Button> */}
+        <MotionButton
+            colorScheme="teal"
+            size="lg"
+            bg="blackAlpha.800"
+            _hover={{
+              boxShadow: '0 0 30px #FF00FF, 0 0 40px #00FFFF',
+              transform: 'scale(1.1)',
+            }}
+            boxShadow="0 0 20px #00FFFF, 0 0 30px #FF00FF"
+            transition="all 0.4s"
+            whileTap={{ scale: 0.9 }}
+            onClick={submitCustomCardNames}
+          >
+            Submit Card Names
+          </MotionButton>
       </VStack>
     ) : (
       <>
       <Box mb={4}>
-  <Text fontSize="lg" fontWeight="bold">Room ID: {roomId}</Text>
+      <Text fontSize="lg" fontWeight="bold" color="white" textShadow="0 0 5px #00FFFF" mb={4}>
+            Room ID: {roomId}
+          </Text>
   <Flex justifyContent="center" alignItems="center" position="relative" gap="20px" >
 
     <Box position={"absolute"} left={-370}>
@@ -373,39 +454,86 @@ const App = () => {
         ) : !gameStart ? (
           <Box mb={4}>
             <Text>The room is full! You can now start the game.</Text>
-            <Button colorScheme="teal" onClick={startGame}>
-              Start Game
-            </Button> 
+            <MotionButton
+            colorScheme="teal"
+            size="lg"
+            bg="blackAlpha.800"
+            _hover={{
+              boxShadow: '0 0 30px #FF00FF, 0 0 40px #00FFFF',
+              transform: 'scale(1.1)',
+            }}
+            boxShadow="0 0 20px #00FFFF, 0 0 30px #FF00FF"
+            transition="all 0.4s"
+            whileTap={{ scale: 0.9 }}
+            onClick={startGame}
+          >
+            Start Game
+          </MotionButton>
           </Box>
         ):(<Box></Box>)
         }
 
-        {cards.length > 0 && (
-          <VStack spacing={4}>
-            <Heading size="md">Your Cards</Heading>
-            <HStack>
-              {cards.map((card, index) => (
-                <Button
-                  key={index}
-                  colorScheme={selectedCard === card ? 'blue' : 'gray'}
-                  onClick={() => handleCardSelection(card)}
-                >
-                  {card}
-                </Button>
-              ))}
-            </HStack>
+        {
+          cards.length > 0 && (
+      <VStack spacing={6}>
+        <Heading size="lg" color="white">Your Cards</Heading>
+        <HStack spacing={6}>
+          {cards.map((card, index) => {
+            const cardColor = getNeonColor(card);  // Assign color based on card name
 
-            <Button
-              colorScheme="teal"
-              isDisabled={!selectedCard || turnPlayer !== username}
-              onClick={() => passCard(selectedCard)}
-            >
-              Pass Selected Card
-            </Button>
-          </VStack>
-        )}
+            return (
+              <MotionButton
+                key={index}
+                onClick={() => handleCardSelection(card)}
+                size="lg"
+                sx={{
+                  bg: selectedCard === card ? cardColor : 'blackAlpha.900',  // Change background on selection only
+                  color: selectedCard === card ? 'black' : cardColor,  // Change text color on selection only
+                  fontSize: '1.2rem', // Larger font for cards
+                  padding: '1.5rem',  // Padding for larger cards
+                  borderRadius: '12px',
+                  border: `2px solid ${cardColor}`,  // Neon border for all cards
+                  height:"120px",
+                  
+                  boxShadow: selectedCard === card
+                    ? `0 0 25px ${cardColor}` // Bright neon glow when selected
+                    : 'none', // No glow when not selected
+                  transition: '0.3s ease', // Smooth transitions
+                }}
+                // No hover color change
+                whileTap={{ scale: 0.95 }}  // Press effect
+              >
+                {card}
+              </MotionButton>
+            );
+          })}
+        </HStack>
 
-        <Alert status="info" mt={4}>
+        <MotionButton
+          colorScheme="teal"
+          isDisabled={!selectedCard || turnPlayer !== username}
+          onClick={() => passCard(selectedCard)}
+          size="lg"
+          sx={{
+            bg: selectedCard ? 'blackAlpha.900' : 'gray.700',
+            color: selectedCard ? 'white' : 'gray.500',
+            padding: '1.5rem',
+            borderRadius: '12px',
+            border: `2px solid ${selectedCard ? getNeonColor(selectedCard) : 'gray'}`, // Neon border when a card is selected
+            boxShadow: selectedCard
+              ? `0 0 25px ${getNeonColor(selectedCard)}`  // Neon glow when a card is selected
+              : 'none',
+            transition: '0.3s ease',
+          }}
+          whileTap={{ scale: 0.95 }}
+        >
+          Pass Selected Card
+        </MotionButton>
+      </VStack>
+    )
+        }
+
+        <Alert status="info" mt={4} className='alert'>
             <AlertIcon />
             {message}
           </Alert>
@@ -413,13 +541,23 @@ const App = () => {
           {winner && (
             <Modal isOpen={isOpen} onClose={onClose} closeOnOverlayClick={false}>
               <ModalOverlay />
-              <ModalContent>
+              <ModalContent
+              as={motion.div}
+                initial={{ opacity: 0, y: -50 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 50 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                bg="rgba(0, 0, 0, 0.95)"
+                color="white"
+                border="2px solid #FF00FF"
+                boxShadow="0 0 40px #FF00FF, 0 0 60px #00FFFF"
+              >
                 <ModalHeader>Game Over</ModalHeader>
                 {/* <ModalCloseButton isDisabled /> */}
                 <ModalBody>
                   <Text>{winner} has won the game!</Text>
                   <Button 
-                  colorScheme="blue" 
+                  colorScheme="BlackAlpha.800" 
                   onClick={()=>{
                     voteRematch();
                     }} 
@@ -428,7 +566,7 @@ const App = () => {
                     Vote for Rematch
                   </Button>
                       <Button
-                        colorScheme="red"
+                        colorScheme="RedAlpha.800"
                         onClick={()=>{
                           handleExitGame();
                           onClose();

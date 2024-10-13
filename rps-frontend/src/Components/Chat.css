@@ -1,0 +1,51 @@
+/* Neon Chat Container */
+.neon-chat-container {
+    background: rgba(0, 0, 0, 0.8); /* Black background for neon contrast */
+    border-radius: 12px;
+    box-shadow: 0 0 15px #00FFFF, 0 0 30px #FF00FF;
+    transition: all 0.3s ease;
+}
+
+.neon-chat-container:hover {
+    box-shadow: 0 0 25px #FF00FF, 0 0 40px #00FFFF;
+}
+
+/* Neon Chat Background */
+.neon-chat-background {
+    background: rgba(0, 0, 0, 0.9); /* Darker background for neon effect */
+    border-radius: 12px;
+}
+
+/* Neon Message Text */
+.neon-message-text {
+    color: #FFFFFF;
+    text-shadow: 0 0 5px #FF00FF, 0 0 10px #00FFFF;
+}
+
+/* Neon Input Field */
+.neon-input {
+    background-color: rgba(0, 0, 0, 0.6);
+    border: 2px solid #FF00FF;
+    color: #FFFFFF;
+    box-shadow: 0 0 10px #00FFFF, 0 0 15px #FF00FF;
+    transition: box-shadow 0.3s ease;
+}
+
+.neon-input:focus {
+    outline: none;
+    box-shadow: 0 0 20px #FF00FF, 0 0 25px #00FFFF;
+}
+
+/* Neon Send Button */
+.neon-button {
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #FFFFFF;
+    border: 2px solid #00FFFF;
+    box-shadow: 0 0 15px #00FFFF, 0 0 20px #FF00FF;
+    transition: all 0.3s ease;
+}
+
+.neon-button:hover {
+    box-shadow: 0 0 25px #FF00FF, 0 0 30px #00FFFF;
+    transform: scale(1.05);
+}

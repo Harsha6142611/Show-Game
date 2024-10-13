@@ -1,24 +1,69 @@
-.card {
-  background: white;
-  border-radius: 10px;
-  width: 120px; /* Set a fixed width */
-  height: 180px; /* Set a fixed height */
-  padding: 20px;
-  text-align: center;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s, box-shadow 0.3s;
-  cursor: pointer;
-  display: flex; /* Flexbox for centering content */
-  align-items: center; /* Center content vertically */
-  justify-content: center; /* Center content horizontally */
-}
+  /* General Neon Styles */
+  html, body, #root {
+ 
+    background-color: #0D0D0D;
+     /* Ensure text is white for contrast */
+  }
+  
+  
+  body {
+    background-color: #0D0D0D; /* Darker for a neon contrast */
+    color: #FFFFFF;
+    font-family: 'Poppins', sans-serif;
+  }
 
-.card:hover {
-  transform: translateY(-5px) rotateY(10deg);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-}
+  p, h1, h2, h3, h4, h5, h6 {
+    color: #FFFFFF;
+    text-shadow: 0 0 20px #FF00FF, 0 0 15px #00FFFF, 0 0 10px #FFFFFF;
+  }
 
-.selected-card {
-  background: lightblue; /* Change the background color for the selected card */
-  border: 2px solid blue; /* Optional: Add a border to make it stand out */
-}
+  button, .chakra-button {
+    text-shadow: 0 0 10px #FFFFFF;
+    box-shadow: 0 0 20px #00FFFF, 0 0 30px #FF00FF;
+    transition: all 0.3s ease-in-out;
+  }
+
+  button:hover, .chakra-button:hover {
+    box-shadow: 0 0 30px #FF00FF, 0 0 40px #00FFFF;
+    transform: scale(1.05); /* Slight pop on hover */
+  }
+
+  /* Inputs Neon Glow */
+  input {
+    background-color: #1A1A1A;
+    border: 2px solid #FF00FF;
+    color: #FFFFFF;
+    padding: 10px;
+    text-shadow: 0 0 5px #00FFFF;
+    box-shadow: 0 0 15px #00FFFF;
+    transition: 0.3s;
+  }
+
+  input:focus {
+    outline: none;
+    box-shadow: 0 0 20px #FF00FF, 0 0 25px #00FFFF;
+  }
+
+  /* Cards Neon Glow */
+  .card {
+    border-radius: 10px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #FFFFFF;
+    text-shadow: 0 0 10px #00FFFF;
+    box-shadow: 0 0 20px #FF00FF, 0 0 30px #00FFFF;
+    transition: transform 0.4s ease, box-shadow 0.4s;
+  }
+
+  .card:hover {
+    transform: scale(1.08) rotate(3deg);
+    box-shadow: 0 0 40px #FF00FF, 0 0 50px #00FFFF;
+  }
+
+  /* Neon Modal */
+  .modal-content {
+    background: rgba(0, 0, 0, 0.95);
+    color: #FFFFFF;
+    border: 2px solid #FF00FF;
+    box-shadow: 0 0 30px #FF00FF, 0 0 50px #00FFFF;
+  }
