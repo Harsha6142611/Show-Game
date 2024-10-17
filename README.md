@@ -37,10 +37,6 @@ This project is a real-time multiplayer card game where users can create game ro
 ### Frontend
 - **React**: Frontend library for building user interfaces.
 - **Socket.IO-Client**: To handle real-time communication from the client side.
-
-### Other Tools
-- **nodemon**: Automatically restarts the server when changes are detected.
-- **Webpack/Babel**: Used for bundling and transpiling frontend code.
   
 ---
 
@@ -82,17 +78,19 @@ Start the server with nodemon for auto-restarts:
 npm run dev
 ```
 
-Or, for a simple start:
-```bash
-npm start
-```
-
 ### Running the Client
 The frontend is built using React. Navigate to the client directory and run:
 ```bash
-cd client
+cd rps-frontend
 npm install
-npm start
+npm run dev
+```
+
+Backend
+```bash
+cd rps-multiplayer
+npm install
+node index
 ```
 
 ### Access the Game
