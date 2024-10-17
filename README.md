@@ -1,3 +1,4 @@
+
 # Multiplayer Card Game with Bots - README
 
 ## Table of Contents
@@ -68,3 +69,95 @@ This project is a real-time multiplayer card game where users can create game ro
 ```bash
 git clone https://github.com/yourusername/multiplayer-card-game.git
 cd multiplayer-card-game
+```
+
+### Install Dependencies
+Run the following command to install both server and client dependencies:
+```bash
+npm install
+```
+
+### Running the Server
+Start the server with nodemon for auto-restarts:
+```bash
+npm run dev
+```
+
+Or, for a simple start:
+```bash
+npm start
+```
+
+### Running the Client
+The frontend is built using React. Navigate to the client directory and run:
+```bash
+cd client
+npm install
+npm start
+```
+
+### Access the Game
+Once the server and client are running, you can open the game by navigating to `http://localhost:3000` in your web browser.
+
+---
+
+## How to Play
+
+1. **Create a Room**: 
+   - On the home page, create a new game room by clicking "Create Room".
+   - Set a custom card deck by entering card names.
+
+2. **Add Players**: 
+   - Share the room code with other players to join the room, or add bots by clicking the "Add Bot" button.
+
+3. **Start the Game**: 
+   - Once the room has enough players, click "Start Game" to begin. Each player will receive cards.
+
+4. **Take Turns**: 
+   - On your turn, select a card and pass it to the next player.
+   - If it's a bot’s turn, a card will be randomly selected and passed automatically.
+
+5. **Win the Game**: 
+   - The winner is the player who completes the objective (this can vary based on custom rules).
+
+---
+
+## Project Structure
+---
+
+rps-frontend/
+│
+├── public/
+├── src/
+│   ├── Components/
+│   │   ├── Chat.jsx        # Chat component for messaging
+│   │   ├── Chat.css        # Chat component styling
+│   │   ├── PlayerCircle.jsx# Component for displaying players
+│   │   ├── VideoChat.jsx   # Jitsi-based video chat component
+│   │   └── PlayerCircle.css# CSS for PlayerCircle (optional if needed)
+│   │
+│   ├── App.jsx             # Main app component
+│   ├── App.css             # Main app styles
+│   ├── index.css           # Global styles for the app
+│   ├── main.jsx            # React entry point for rendering
+│   └── .gitignore          # Ignore node_modules, build files, etc.
+│
+└── README.md               # Documentation file with setup, game rules, etc.
+
+
+---
+
+## Contributing
+
+If you'd like to contribute to this project:
+1. Fork the repository.
+2. Create a new feature branch (`git checkout -b feature-branch`).
+3. Commit your changes (`git commit -m 'Add new feature'`).
+4. Push to your branch (`git push origin feature-branch`).
+5. Open a Pull Request.
+
+---
+
+## License
+
+This project is licensed under the MIT License. Feel free to use and modify the code as per the license terms.
