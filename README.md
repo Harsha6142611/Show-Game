@@ -122,31 +122,6 @@ Once the server and client are running, you can open the game by navigating to `
 
 ---
 
-## Project Structure
----
-
-rps-frontend/
-│
-├── public/
-├── src/
-│   ├── Components/
-│   │   ├── Chat.jsx        # Chat component for messaging
-│   │   ├── Chat.css        # Chat component styling
-│   │   ├── PlayerCircle.jsx# Component for displaying players
-│   │   ├── VideoChat.jsx   # Jitsi-based video chat component
-│   │   └── PlayerCircle.css# CSS for PlayerCircle (optional if needed)
-│   │
-│   ├── App.jsx             # Main app component
-│   ├── App.css             # Main app styles
-│   ├── index.css           # Global styles for the app
-│   ├── main.jsx            # React entry point for rendering
-│   └── .gitignore          # Ignore node_modules, build files, etc.
-│
-└── README.md               # Documentation file with setup, game rules, etc.
-
-
----
-
 ## Contributing
 
 If you'd like to contribute to this project:
