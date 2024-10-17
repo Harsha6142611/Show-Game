@@ -8,9 +8,8 @@
 4. [Game Rules](#game-rules)
 5. [How to Setup](#how-to-setup)
 6. [How to Play](#how-to-play)
-7. [Project Structure](#project-structure)
-8. [Contributing](#contributing)
-9. [License](#license)
+7. [Contributing](#contributing)
+8. [License](#license)
 
 ---
 
