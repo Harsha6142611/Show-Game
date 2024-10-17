@@ -94,7 +94,8 @@ node index
 ```
 
 ### Access the Game
-Once the server and client are running, you can open the game by navigating to `http://localhost:3000` in your web browser.
+Once the server and client are running, you can open the game by navigating to `http://localhost:5173` in your web browser.
+backend should run at `http://localhost:3001`
 
 ---
 
