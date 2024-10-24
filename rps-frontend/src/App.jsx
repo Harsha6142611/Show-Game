@@ -98,15 +98,6 @@ const App = () => {
       setSelectedCard(''); // Clear selected card when turn changes
     });
 
-    // socket.on('update-cards', (data) => {
-
-    //   const { UpdatedCards } = data;
-    //   console.log('Updated cards for:', data.username);
-    //   setCards(UpdatedCards); // Update the player's cards with the new data
-      
-
-    // });
-
     socket.on('update-cards', (data) => {
       const { UpdatedCards } = data;
       setCards(UpdatedCards); // Update the player's cards with the new data
@@ -156,7 +147,7 @@ const App = () => {
       setMessage("The rematch is starting!");
       setCards(cards); // Clear player cards for the new game
       setWinner(''); // Reset winner state
-      
+      setIsBot(false);
     });
 
     
@@ -219,7 +210,7 @@ const App = () => {
     setTimeout(() => {
         passCard(); 
       
-    }, 3000); 
+    }, 1000); 
   };
 
 

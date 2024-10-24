@@ -214,6 +214,19 @@ io.on('connection', (socket) => {
       // For example, we'll let the bot pass the first card it has
       if (currentPlayer.cards.length > 0) {
         // Automatically choose the first card to pass
+        // Check if the current player (bot or real player) has won
+  const cardCounts = currentPlayer.cards.reduce((acc, card) => {
+    acc[card] = (acc[card] || 0) + 1;
+    return acc;
+  }, {});
+ console.log(currentPlayer.username+" "+Object.values(cardCounts));
+  const hasWon = Object.values(cardCounts).some(count => count === 4);
+
+  if (hasWon) {
+    io.in(roomId).emit('game-won', { winner: currentPlayer.username });
+    console.log(`Player ${currentPlayer.username} has won the game in room ${roomId}`);
+    return callback({ success: true });
+  } 
         cardToPass = currentPlayer.cards[0];
         const cardIndex = currentPlayer.cards.indexOf(cardToPass);
       console.log("Card index:"+cardIndex);
@@ -230,19 +243,7 @@ io.on('connection', (socket) => {
 
   }
 
-    // Check if the current player (bot or real player) has won
-  const cardCounts = currentPlayer.cards.reduce((acc, card) => {
-    acc[card] = (acc[card] || 0) + 1;
-    return acc;
-  }, {});
- console.log(currentPlayer.username+" "+cardCounts);
-  const hasWon = Object.values(cardCounts).some(count => count === 4);
-
-  if (hasWon) {
-    io.in(roomId).emit('game-won', { winner: currentPlayer.username });
-    console.log(`Player ${currentPlayer.username} has won the game in room ${roomId}`);
-    return callback({ success: true });
-  } 
+    
 
     const nextPlayerIndex = (room.turnIndex + 1) % room.numPlayers;
     const nextPlayer = room.players[nextPlayerIndex];
