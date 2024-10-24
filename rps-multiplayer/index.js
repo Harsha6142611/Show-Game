@@ -227,8 +227,19 @@ io.on('connection', (socket) => {
     console.log(`Player ${currentPlayer.username} has won the game in room ${roomId}`);
     return callback({ success: true });
   } 
-        cardToPass = currentPlayer.cards[0];
-        const cardIndex = currentPlayer.cards.indexOf(cardToPass);
+        // cardToPass = currentPlayer.cards[0];
+        // const cardIndex = currentPlayer.cards.indexOf(cardToPass);
+
+        // Advanced card-passing strategy: prioritize passing cards based on frequency
+    const cardProbabilities = Object.entries(cardCounts).map(([card, count]) => ({
+      card,
+      probability: 1 / count 
+    }));
+
+    cardProbabilities.sort((a, b) => b.probability - a.probability);
+    cardToPass = cardProbabilities[0].card;
+    console.log("Bot selected card to pass: " + cardToPass);
+    const cardIndex = currentPlayer.cards.indexOf(cardToPass);
       console.log("Card index:"+cardIndex);
       if (cardIndex > -1) {
         currentPlayer.cards.splice(cardIndex, 1);
