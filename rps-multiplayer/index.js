@@ -62,7 +62,7 @@ io.on('connection', (socket) => {
   socket.on('create-room', (username, numPlayers, callback) => {
     const roomId = uuidv4();
     rooms[roomId] = {
-      players: [{ id: socket.id, username, cards: [] }],
+      players: [{ id: socket.id, username, cards: [], isBot:false }],
       numPlayers,
       turnIndex: 0,
       isGameStarted: false,
@@ -102,6 +102,36 @@ io.on('connection', (socket) => {
     }
   });
 
+  //Add Bots to the real players
+  socket.on('add-bots', ({ roomId, botsToAdd, numPlayers }, callback) => {
+   
+    console.log("RoomId: " + roomId + " Bots to add: " + botsToAdd);  
+    const room = rooms[roomId];
+    console.log(room.players.length);
+    console.log(numPlayers);
+    console.log(room.players.length + botsToAdd <= numPlayers);
+    if (room.players.length + botsToAdd <= numPlayers) {
+      console.log("Adding bots");
+      for (let i = 0; i < botsToAdd; i++) {
+        let randomNumber = Math.floor(Math.random() * 1000);
+        randomNumber = randomNumber.toString();
+        const botName = `Bot_${randomNumber}`;
+        room.players.push({ id:randomNumber ,username: botName,cards: [], isBot:true });
+      }
+
+      console.log(room.players);
+      io.to(roomId).emit('update-players', room.players); // Notify everyone in the room about the new players
+      if (room.players.length === room.numPlayers) {
+        io.in(roomId).emit('room-full');
+        console.log(`Room ${roomId} is now full.`);
+      }
+      callback({ success: true });
+    } else {
+      callback({ success: false, message: 'Not enough space for more bots or room does not exist' });
+    }
+  });
+  
+
   // Start the game
   socket.on('start-game', (roomId) => {
     console.log("game started "+roomId);
@@ -136,9 +166,7 @@ io.on('connection', (socket) => {
       }
       return;
     }
-  
-    // Store custom card names in the room (without generating the deck yet)
-    // room.customCards = room.customCards.concat(customCardNames);
+    
     room.customCards.push(...customCardNames);
     room.cardsSubmitted += 1;
   
@@ -165,16 +193,56 @@ io.on('connection', (socket) => {
     const room = rooms[roomId];
     if (!room || !room.isGameStarted) return;
     const currentPlayer = room.players[room.turnIndex];
-    if (currentPlayer.id !== socket.id) {
-      return callback({ success: false, message: "It's not your turn!" });
-    }
+    console.log("Bot: " + currentPlayer.isBot);
+    console.log("current player: " + currentPlayer.username);
+    if (!currentPlayer.isBot) {
+      if (currentPlayer.id !== socket.id) {
+        return callback({ success: false, message: "It's not your turn!" });
+      }
+      const cardIndex = currentPlayer.cards.indexOf(cardToPass);
+      console.log("Card index:"+cardIndex);
+      if (cardIndex > -1) {
+        currentPlayer.cards.splice(cardIndex, 1);
+      } else {
+        return callback({ success: false, message: 'Card not found in your hand!' });
+      }
+      
+    }else if(currentPlayer.isBot){
+      console.log("Bot cards: " + currentPlayer.cards);
+      // console.log("Bot pass card: " + cardToPass);
+      // Logic for the bot to automatically pass a card
+      // For example, we'll let the bot pass the first card it has
+      if (currentPlayer.cards.length > 0) {
+        // Automatically choose the first card to pass
+        cardToPass = currentPlayer.cards[0];
+        const cardIndex = currentPlayer.cards.indexOf(cardToPass);
+      console.log("Card index:"+cardIndex);
+      if (cardIndex > -1) {
+        currentPlayer.cards.splice(cardIndex, 1);
+      } else {
+        return callback({ success: false, message: 'Card not found in your hand!' });
+      }
+      } else {
+        return callback({ success: false, message: 'No cards to pass!' });
+      }
+    
+   
 
-    const cardIndex = currentPlayer.cards.indexOf(cardToPass);
-    if (cardIndex > -1) {
-      currentPlayer.cards.splice(cardIndex, 1);
-    } else {
-      return callback({ success: false, message: 'Card not found in your hand!' });
-    }
+  }
+
+    // Check if the current player (bot or real player) has won
+  const cardCounts = currentPlayer.cards.reduce((acc, card) => {
+    acc[card] = (acc[card] || 0) + 1;
+    return acc;
+  }, {});
+ console.log(currentPlayer.username+" "+cardCounts);
+  const hasWon = Object.values(cardCounts).some(count => count === 4);
+
+  if (hasWon) {
+    io.in(roomId).emit('game-won', { winner: currentPlayer.username });
+    console.log(`Player ${currentPlayer.username} has won the game in room ${roomId}`);
+    return callback({ success: true });
+  } 
 
     const nextPlayerIndex = (room.turnIndex + 1) % room.numPlayers;
     const nextPlayer = room.players[nextPlayerIndex];
@@ -194,6 +262,7 @@ io.on('connection', (socket) => {
 
     io.in(roomId).emit('next-turn', {
       nextTurnPlayer: nextPlayer.username,
+      isBotTurn: nextPlayer.isBot,
     });
 
     io.in(roomId).emit('update-players', room.players.map((player) => ({
@@ -215,15 +284,16 @@ io.on('connection', (socket) => {
     const room = rooms[roomId];
     if (!room) return callback({ success: false, message: 'Room not found' });
 
-    room.rematchVotes += 1;
 
+    room.rematchVotes += 1;
+    const numberOfBots = room.players.filter(player => player.isBot).length;
     io.in(roomId).emit('rematch-vote', {
       rematchVotes: room.rematchVotes,
       totalPlayers: room.numPlayers,
     });
 
     // If all players voted for a rematch, reset the room and start a new game
-    if (room.rematchVotes === room.numPlayers) {
+    if (room.rematchVotes+numberOfBots === room.numPlayers) {
       console.log(`Room ${roomId}: All players voted for a rematch. Restarting game.`);
       room.rematchVotes = 0;
       room.cardsSubmitted = 0;

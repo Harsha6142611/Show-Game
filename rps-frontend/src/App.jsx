@@ -27,8 +27,8 @@ import VideoChat from './Components/VideoChat';
 import { motion } from 'framer-motion';
 const MotionButton = motion(Button);
 
-const socket = io('https://show-game.onrender.com');
-// const socket = io("http://localhost:3001");
+// const socket = io('https://show-game.onrender.com');
+const socket = io("http://localhost:3001");
 
 
 const App = () => {
@@ -52,7 +52,8 @@ const App = () => {
   const [rematchVotes, setRematchVotes] = useState(0);
   const [hasVoted, setHasVoted] = useState(false);
   const [currentPage, setCurrentPage] = useState("home");
-  
+  const [botsadd , setBotsAdded] = useState(false);
+  const [isBot, setIsBot] = useState(false);
   const neonColors = ['#00FFFF', '#FF00FF', '#00FF00', '#FFEA00', '#FF1493', '#1E90FF', '#FF4500'];
   // Function to consistently map cards to the same color
   const getNeonColor = (card) => {
@@ -60,14 +61,20 @@ const App = () => {
     const hash = Array.from(card).reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return neonColors[hash % neonColors.length];
   };
+
+  useEffect(() => {
+    if (isBot) {
+      // If `isBot` state is true, handle the bot's turn
+      console.log("Bot's turn detected in useEffect.");
+      handleBotTurn(); // Call handleBotTurn only when `isBot` is updated
+    }
+  }, [isBot]);
+
+  
   
   useEffect(() => {
     socket.on('update-players', (updatedPlayers) => {
       setPlayers(updatedPlayers);
-    });
-
-    socket.on('player-exited', () => {
-      
     });
 
     socket.on('room-full', () => {
@@ -84,11 +91,21 @@ const App = () => {
     });
 
     socket.on('next-turn', (gameState) => {
-      const { nextTurnPlayer } = gameState;
+      const { nextTurnPlayer, isBotTurn } = gameState;
+      setIsBot(isBotTurn);
       setTurnPlayer(nextTurnPlayer); // Set next player's turn
       setMessage(`${nextTurnPlayer}'s turn`);
       setSelectedCard(''); // Clear selected card when turn changes
     });
+
+    // socket.on('update-cards', (data) => {
+
+    //   const { UpdatedCards } = data;
+    //   console.log('Updated cards for:', data.username);
+    //   setCards(UpdatedCards); // Update the player's cards with the new data
+      
+
+    // });
 
     socket.on('update-cards', (data) => {
       const { UpdatedCards } = data;
@@ -109,6 +126,7 @@ const App = () => {
     });
 
     socket.on('game-won', (winner) => {
+      console.log(winner);
       setMessage(`${winner.winner} has won the game!`);
       setWinner(winner.winner); // Set the winner's name
       onOpen(); // Open the modal
@@ -196,23 +214,51 @@ const App = () => {
     socket.emit('start-game', roomId);
   };
 
-  const passCard = (card) => {
-    if (!card) {
-      setMessage('You must select a card to pass!');
-      return;
-    }
-
-    socket.emit('pass-card', roomId, card, (response) => {
-      if (response.success) {
-        setSelectedCard(''); // Clear selected card after successful pass
-        setMessage(`You passed ${card}. Waiting for the next turn...`);
-      } else {
-        setMessage(response.message);
-      }
-    });
-
+  const handleBotTurn = () => {
+    console.log("Bot Turn");
+    setTimeout(() => {
+        passCard(); 
+      
+    }, 3000); 
   };
 
+
+
+  const passCard = (card) => {
+    console.log("Is bot:", isBot);
+  
+    // If it's a bot, let the backend choose the card to pass
+    if (isBot && !card) {
+      // Handle bot's card passing logic here (set a default card or handle bot-specific logic)
+      console.log("Passing card for bot automatically");
+      socket.emit('pass-card', roomId, null, (response) => {
+        if (response.success) {
+          setSelectedCard(''); // Clear selected card after successful pass
+          setMessage(`Bot passed a card. Waiting for the next turn...`);
+        } else {
+          setMessage(response.message);
+        }
+      });
+    } else {
+      // If no card is selected and it's a player's turn, show an error
+      if (!card && !isBot) {
+        setMessage('You must select a card to pass!');
+        console.log("No card selected");
+        return;
+      }
+  
+      console.log("Passing card:", card || 'bot turn');
+      socket.emit('pass-card', roomId, card || null, (response) => {
+        if (response.success) {
+          setSelectedCard(''); // Clear selected card after successful pass
+          setMessage(`You passed ${card}. Waiting for the next turn...`);
+        } else {
+          setMessage(response.message);
+        }
+      });
+    }
+  };
+  
   const handleCardSelection = (card) => {
     setSelectedCard(card); // Set the selected card
   };
@@ -263,6 +309,24 @@ const App = () => {
   
   };
 
+  const addBotsToRoom = () => {
+    const botsToAdd = numPlayers - players.length; // Calculate how many bots are needed
+    console.log(botsToAdd);
+    if (botsToAdd > 0) {
+      socket.emit('add-bots', { roomId, botsToAdd, numPlayers }, (response) => {
+        if (response.success) {
+          setBotsAdded(true);
+          setMessage(`${botsToAdd} bot(s) added to the room!`);
+        } else {
+          setMessage(response.message);
+        }
+      });
+    } else {
+      alert('Room is already full!');
+    }
+  };
+  
+
   const handleExitGame = () => {
     setIsRoomCreated(false);
     setCurrentPage("home");
@@ -283,6 +347,8 @@ const App = () => {
     setMessage('');        // Clear any messages
     setCustomCardsSubmitted(false); // Reset custom cards submission status
     setCardNames([]);  
+    setIsBot(false);
+    setBotsAdded(false);
     socket.emit('exit-game', roomId, (response) => {
       if (response.success) {
         // Redirect to home or perform necessary UI updates
@@ -444,6 +510,26 @@ const App = () => {
 
   </Flex>
 </Box>
+
+    
+        {isRoomCreated && isRoomCreator && customCardsSubmitted && !botsadd&& (
+          <MotionButton
+            colorScheme="teal"
+            size="lg"
+            bg="blackAlpha.800"
+            _hover={{
+              boxShadow: '0 0 30px #FF00FF, 0 0 40px #00FFFF',
+              transform: 'scale(1.1)',
+            }}
+            boxShadow="0 0 20px #00FFFF, 0 0 30px #FF00FF"
+            transition="all 0.4s"
+            whileTap={{ scale: 0.9 }}
+            onClick={addBotsToRoom}
+          >
+            Add bots
+          </MotionButton>
+        )
+        }
 
 
         {!isRoomFull ? (
