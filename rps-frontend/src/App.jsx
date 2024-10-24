@@ -374,7 +374,7 @@ const App = () => {
       textAlign="center"
       justifyContent="center"
       alignItems="center">
-    <Heading  mb={4} textShadow="0 0 20px #FF00FF, 0 0 15px #00FFFF" >Multiplayer Card Game</Heading>
+    <Heading  mb={4} textShadow="0 0 20px #FF00FF, 0 0 15px #00FFFF" >Multiplayer Card Game</Heading> <br />
     {!isRoomCreated && currentPage==="home"? (
       <VStack spacing={4} align="center">
         <Input
@@ -393,8 +393,8 @@ const App = () => {
             color="white"
             textShadow="0 0 5px #00FFFF"
 
-        /> <br />
-        <Heading size="md">Create Room</Heading>
+        /> 
+        {/* <Heading size="md">Create Room</Heading> */}
         {/* <Input
           type="number"
           placeholder="Number of players"
@@ -443,7 +443,7 @@ const App = () => {
           </MotionButton>
   
           <br />
-        <Heading size="md">Join Room</Heading>
+        {/* <Heading size="md">Join Room</Heading> */}
         <Input
           placeholder="Enter room ID"
           value={roomIdInput}
