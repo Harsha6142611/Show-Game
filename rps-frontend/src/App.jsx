@@ -27,8 +27,8 @@ import VideoChat from './Components/VideoChat';
 import { motion } from 'framer-motion';
 const MotionButton = motion(Button);
 
-const socket = io('https://show-game.onrender.com');
-// const socket = io("http://localhost:3001");
+// const socket = io('https://show-game.onrender.com');
+const socket = io("http://localhost:3001");
 
 
 const App = () => {
@@ -68,7 +68,7 @@ const App = () => {
       console.log("Bot's turn detected in useEffect.");
       handleBotTurn(); // Call handleBotTurn only when `isBot` is updated
     }
-  }, [isBot]);
+  }, [turnPlayer]);
 
   
   
@@ -92,6 +92,7 @@ const App = () => {
 
     socket.on('next-turn', (gameState) => {
       const { nextTurnPlayer, isBotTurn } = gameState;
+      console.log(nextTurnPlayer+" "+isBotTurn);
       setIsBot(isBotTurn);
       setTurnPlayer(nextTurnPlayer); // Set next player's turn
       setMessage(`${nextTurnPlayer}'s turn`);
@@ -350,7 +351,17 @@ const App = () => {
       }
     });
   };
-  
+  const handleIncrement = () => {
+    if (numPlayers < 8) {
+      setNumPlayers(prev => prev + 1);
+    }
+  };
+
+  const handleDecrement = () => {
+    if (numPlayers > 2) {
+      setNumPlayers(prev => prev - 1);
+    }
+  };
   return (
      <Center     
      as={motion.div}
@@ -384,7 +395,7 @@ const App = () => {
 
         /> <br />
         <Heading size="md">Create Room</Heading>
-        <Input
+        {/* <Input
           type="number"
           placeholder="Number of players"
           value={numPlayers}
@@ -394,7 +405,23 @@ const App = () => {
             min={2} // Minimum value
             max={8}
           width="300px" // Optional
-        />
+        /> */}
+        <Box display="flex" alignItems="center">
+      <Button onClick={handleDecrement} disabled={numPlayers <= 2}>
+        -
+      </Button>
+      <Input
+        type="number"
+        value={numPlayers}
+        readOnly
+        width="80px"
+        textAlign="center"
+        mx={2}
+      />
+      <Button onClick={handleIncrement} disabled={numPlayers >= 8}>
+        +
+      </Button>
+    </Box>
         {/* <Button colorScheme="teal" onClick={createRoom}>
           Create Room
         </Button> */}
